@@ -55,6 +55,8 @@ public class OIDCHybridResponseTypeCodeIDTokenTest extends AbstractOIDCResponseT
     protected List<IDToken> testAuthzResponseAndRetrieveIDTokens(OAuthClient.AuthorizationEndpointResponse authzResponse, EventRepresentation loginEvent) {
         Assert.assertEquals(OIDCResponseType.CODE + " " + OIDCResponseType.ID_TOKEN, loginEvent.getDetails().get(Details.RESPONSE_TYPE));
 
+        OAuthClient.AccessTokenResponse authzResponse2 = sendTokenRequestAndGetResponse(loginEvent);
+
         // IDToken from the authorization response
         Assert.assertNull(authzResponse.getAccessToken());
         String idTokenStr = authzResponse.getIdToken();
@@ -72,6 +74,12 @@ public class OIDCHybridResponseTypeCodeIDTokenTest extends AbstractOIDCResponseT
         Assert.assertNotNull(idToken.getStateHash());
 
         Assert.assertEquals(idToken.getStateHash(), HashUtils.oidcHash(getIdTokenSignatureAlgorithm(), authzResponse.getState()));
+
+        // Validate if token_type is null
+        Assert.assertNull(authzResponse2.getTokenType());
+
+        // Validate if expires_in is null
+        Assert.assertNull(authzResponse2.getExpiresIn());
 
         // IDToken exchanged for the code
         IDToken idToken2 = sendTokenRequestAndGetIDToken(loginEvent);

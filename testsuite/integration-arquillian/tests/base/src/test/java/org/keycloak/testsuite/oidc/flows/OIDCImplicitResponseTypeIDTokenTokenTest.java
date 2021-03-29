@@ -55,6 +55,8 @@ public class OIDCImplicitResponseTypeIDTokenTokenTest extends AbstractOIDCRespon
     protected List<IDToken> testAuthzResponseAndRetrieveIDTokens(OAuthClient.AuthorizationEndpointResponse authzResponse, EventRepresentation loginEvent) {
         Assert.assertEquals(OIDCResponseType.ID_TOKEN + " " + OIDCResponseType.TOKEN, loginEvent.getDetails().get(Details.RESPONSE_TYPE));
 
+        OAuthClient.AccessTokenResponse authzResponse2 = sendTokenRequestAndGetResponse(loginEvent);
+
         Assert.assertNotNull(authzResponse.getAccessToken());
         String idTokenStr = authzResponse.getIdToken();
         IDToken idToken = oauth.verifyIDToken(idTokenStr);
@@ -64,6 +66,12 @@ public class OIDCImplicitResponseTypeIDTokenTokenTest extends AbstractOIDCRespon
 
         // Validate "c_hash"
         Assert.assertNull(idToken.getCodeHash());
+
+        // Validate if token_type is null
+        Assert.assertNull(authzResponse2.getTokenType());
+
+        // Validate if expires_in is null
+        Assert.assertNull(authzResponse2.getExpiresIn());
 
         return Collections.singletonList(idToken);
     }
